@@ -85,14 +85,6 @@ class Controller {
 				$exams = new Collection\Exams($this->user['username']);
 				$exams->fetch($this->lsf);
 				$exams->write($this->db);
-				
-				// Setup welcome message
-				$this->db->query('INSERT INTO messages (receiver, title, text, href, notified) VALUES (:receiver, :title, :text, :href, CURRENT_TIMESTAMP)', [
-					'receiver' => $this->user['username'],
-					'title' => 'Willkommen zur Beta, '.strstr($this->user['displayname'], ' ', true).'!',
-					'text' => 'Du kannst jetzt die neue Version der HFT App testen.<br>Tippe hier, um Feedback zu senden oder Fehler zu melden. Du kannst auch Screenshots anhängen.',
-					'href' => 'mailto:info@hft-app.de',
-				]);
 			}
 			
 			// Logout at gateway
