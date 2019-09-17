@@ -11,7 +11,7 @@ class Exams extends \Collection {
 	private static $indices = [
 		0 => 'id',
 		1 => 'title',
-		//2 => 'semester',
+		2 => 'semester',
 		3 => 'grade',
 		4 => 'status',
 		5 => 'cp',
@@ -25,6 +25,7 @@ class Exams extends \Collection {
 		switch($index) {
 			case 'id': return $value;
 			case 'title': return str_replace('Prüfungsvorleistung', 'PVL', $value);
+			case 'semester': return $value;
 			case 'grade': return $value == '0,0' || $value == '' ? NULL : floatval(str_replace(',', '.', $value));
 			case 'status': return $value;
 			case 'cp': return $value == '0,0' ? NULL : floatval(str_replace(',', '.', $value));
@@ -47,9 +48,12 @@ class Exams extends \Collection {
 		// Parse exams
 		$this->list = [];
 		foreach($gateway->fetch($graduation[0]->getAttribute('href'))->query('//table[2]/tr[position() > 2]') as $y => $row) {
-			$this->list[$y] = [];
+			
+			// Skip invalid cols (e.g. duplicate/incomplete "Gesamtnote" after graduation)
+			if(count($row->childNodes) != 9) continue;
 			
 			// Parse exam details
+			$this->list[$y] = [];
 			foreach($row->childNodes as $x => $col) {
 				if(isset(self::$indices[$x])) {
 					$index = self::$indices[$x];
@@ -57,17 +61,14 @@ class Exams extends \Collection {
 				}
 			}
 		}
-		
-		// Reverse order
-		$this->list = array_reverse($this->list);
 	}
 	
 	// Write exams
 	public function write($db) {		
 		$db->query('DELETE FROM exams WHERE user = ?', $this->user);
 		foreach($this->list as $exam) $db->query('
-			INSERT INTO exams (id, user, title, status, grade, cp, try, date) 
-			VALUES (:id, :user, :title, :status, :grade, :cp, :try, :date)
+			INSERT INTO exams (id, user, title, semester, status, grade, cp, try, date) 
+			VALUES (:id, :user, :title, :semester, :status, :grade, :cp, :try, :date)
 		', $exam + ['user' => $this->user]);
 	}
 	
