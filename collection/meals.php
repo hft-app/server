@@ -11,7 +11,7 @@ class Meals extends \Collection {
 			foreach($menu as $index => $meal) $this->list[] = [
 				'date' => $date,
 				'title' => $meal['meal'].(strlen($meal['description']) > 0 ? ', ' : '').$meal['description'],
-				'photo' => 'https://sws2.maxmanager.xyz/assets/'.(empty($meal['foto']) ? 'fotos/musikhochschule/Speisefotos/0-1/27816947m_dummy_speisen.jpg' : $meal['foto']),
+				'photo' => empty($meal['foto']) ? '' : 'https://sws2.maxmanager.xyz/assets/'.$meal['foto'],
 				'price' => floatval(str_replace(',', '.', $meal['price1'])),
 				'additives' => str_replace(',', ', ', $meal['additives'])
 			];
