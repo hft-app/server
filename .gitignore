@@ -1,2 +1,3 @@
-_notes/
-/config.php
+/core/config.php
+/endpoint/web.config
+/logs
