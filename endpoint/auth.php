@@ -1,4 +1,4 @@
-<?php require '../code/controller.php';
+<?php require '../core/controller.php';
 try {
 	
 	// Constructor

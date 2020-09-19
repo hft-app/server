@@ -5,7 +5,7 @@ if(PHP_SAPI != 'cli') exit;
 chdir(__DIR__); // sys32 by default
 
 // Load dependencies
-require '../server/controller.php';
+require '../core/controller.php';
 require 'service.php';
 require 'cache.php';
 
