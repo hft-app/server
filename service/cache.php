@@ -27,15 +27,15 @@
 		// Clear inactive devices and users
 		$devices = $this->controller->db->query('DELETE FROM devices WHERE active < ADDDATE(CURRENT_TIMESTAMP, INTERVAL -3 MONTH)');
 		$users = $this->controller->db->query('DELETE FROM users WHERE active < ADDDATE(CURRENT_TIMESTAMP, INTERVAL -1 YEAR)');
-		if($devices->rowCount() > 0) Service::log('cleared '.$devices->rowCount().' devices');
-		if($users->rowCount() > 0) Service::log('cleared '.$users->rowCount().' users');
+		if($devices->rowCount() > 0) print 'cleared '.$devices->rowCount().' devices';
+		if($users->rowCount() > 0) print 'cleared '.$users->rowCount().' users';
 		
 		// Refresh subjects
 		if(time() - $this->refreshed['subjects'] > 60*60*24) {
 			$this->refreshed['subjects'] = time();
 			
 			// Log action
-			Service::log('refreshing subjects');
+			print 'refreshing subjects';
 			
 			// Fetch subjects
 			$subjects = new Collection\Subjects();
@@ -43,7 +43,7 @@
 			$subjects->write($this->controller->db);
 			
 			// Log action
-			return Service::log($subjects->length().' subjects refreshed');
+			return print $subjects->length().' subjects refreshed';
 		}
 		
 		// Refresh events
@@ -51,7 +51,7 @@
 			$this->refreshed['events'] = time();
 			
 			// Log action
-			Service::log('refreshing events');
+			print 'refreshing events';
 			
 			// Fetch events
 			$events = new Collection\Events();
@@ -59,15 +59,15 @@
 			$events->write($this->controller->db);
 			
 			// Log action
-			return Service::log($events->length().' events refreshed');
 		}
+			return print $events->length().' events refreshed';
 		
 		// Refresh meals
 		if(time() - $this->refreshed['meals'] > 60*60*24) {
 			$this->refreshed['meals'] = time();
 			
 			// Log action
-			Service::log('refreshing meals');
+			print 'refreshing meals';
 			
 			// Fetch meals
 			$meals = new Collection\Meals();
@@ -75,7 +75,7 @@
 			$meals->write($this->controller->db);
 			
 			// Log action
-			return Service::log($meals->length().' meals refreshed');
+			return print $meals->length().' meals refreshed';
 		}
 		
 		// Refresh professors
@@ -83,7 +83,7 @@
 			$this->refreshed['professors'] = time();
 			
 			// Log action
-			Service::log('refreshing professors');
+			print 'refreshing professors';
 			
 			// Fetch professors
 			$professors = new Collection\Professors();
@@ -91,8 +91,8 @@
 			$professors->write($this->controller->db);
 			
 			// Log action
-			return Service::log($professors->length().' professors refreshed');
 		}
+			return print $professors->length().' professors refreshed';
 		
 		// Refresh courses and lectures by subject
 		{
@@ -107,7 +107,7 @@
 				$subject = $query['subject']->fetch();
 				
 				// Log action
-				Service::log('refreshing courses and lectures of subject '.$subject['id']);
+				print 'refreshing courses and lectures of subject '.$subject['id'];
 				
 				// Update refresh time
 				$this->controller->db->query('UPDATE subjects SET refreshed = CURRENT_TIMESTAMP WHERE id = ?', $subject['id']);
@@ -123,7 +123,7 @@
 				$lectures->write($this->controller->db);
 					
 				// Log action
-				return Service::log($courses->length().' courses with a total of '.$lectures->length().' lectures refreshed for subject '.$subject['id']);
+				return print $courses->length().' courses with a total of '.$lectures->length().' lectures refreshed for subject '.$subject['id'];
 			}
 		}
 		
@@ -150,11 +150,11 @@
 				$this->controller->db->query('UPDATE users SET refreshed = CURRENT_TIMESTAMP WHERE username = ?', $user['username']);
 				
 				// Log action
-				Service::log('refreshing exams for user '.$user['username']);
+				print 'refreshing exams for user '.$user['username'];
 				
 				// Login at gateway
 				if(!$this->controller->lsf->login($user['username'], $user['password'])) {
-					Service::log('invalidated user '.$user['username']);
+					print 'invalidated user '.$user['username'];
 					return $this->controller->db->query('UPDATE users SET valid = FALSE WHERE username = ?', $user['username']);
 				}
 
@@ -203,7 +203,7 @@
 					);
 					
 					// Log notification
-					Service::log('Notification mail sent to '.$user['username']);
+					print 'Notification mail sent to '.$user['username'];
 					$this->controller->db->query('INSERT INTO mails (username, time, subject, sent) VALUES (:username, :time, :subject, :sent)', [
 						'username' => $user['username'],
 						'time' => time(),
@@ -213,7 +213,7 @@
 				}
 				
 				// Log action
-				return Service::log($new->length().' exams refreshed for user '.$user['username']);
+				return print $new->length().' exams refreshed for user '.$user['username'];
 			}
 		}
 		
