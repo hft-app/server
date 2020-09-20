@@ -64,7 +64,13 @@
 				$this->setStatus(WIN32_SERVICE_RUNNING);
 				
 				// Trigger a cycle if the pause is over
-				if($this->timer < $this->config['interval']) call_user_func($this->config['runner']);
+				if($this->timer < $this->config['interval']) try {
+					call_user_func($this->config['runner']);
+					
+				// Exception handling
+				} catch(Exception $e) {
+					print "EXCEPTION\t".var_export($e->getMessage(), true);
+				}
 			} return true;
 		}
 	}
